@@ -58,6 +58,15 @@ pub trait Axiom: Send + Sync {
     fn evaluate(&self, state: &SubstrateState) -> AxiomResult;
     fn is_applicable(&self, context: &AxiomContext) -> bool;
 }
+
+pub enum AxiomResult {
+    Pass,
+    Violation {
+        code: String,
+        message: String,
+        remediation: Option<String>,
+    },
+}
 ```
 
 ### 2. MCP Engine (`axiom-mcp`)
@@ -65,8 +74,14 @@ pub trait Axiom: Send + Sync {
 Pre-inference constraint enforcement:
 
 ```rust
-let mut engine = MCPEngine::new(config);
+let mut engine = MCPEngine::new(MCPEngineConfig::default());
 engine.register_axiom(Arc::new(RepositoryAccessConsistency))?;
+
+let context = AxiomContext {
+    query: "Why can't I access this repository?".to_string(),
+    user_context: Some("developer@example.com".to_string()),
+    deployment_context: Some("corporate-internal".to_string()),
+};
 
 let evaluations = engine.evaluate_pre_inference(&substrate_state, &context)?;
 // If any axiom fails, inference is halted BEFORE LLM is called
@@ -77,10 +92,10 @@ let evaluations = engine.evaluate_pre_inference(&substrate_state, &context)?;
 Active probing of actual system state:
 
 ```rust
-let prober = HttpProber::new(config)?;
+let prober = HttpProber::new(ProbeConfig::default())?;
 let state = prober.probe_repository("https://example.com/repo").await?;
 
-let verifier = SubstrateVerifier::new(config);
+let verifier = SubstrateVerifier::new(VerificationConfig::default());
 let verification = verifier.verify_repo_config(&state);
 ```
 
@@ -89,9 +104,10 @@ let verification = verifier.verify_repo_config(&state);
 Merkle-chained immutable logging:
 
 ```rust
-let log = LSTLog::new(config);
+let log = LSTLog::new(LogConfig::default());
 let mut entry = LSTEntry::new(1, "query", "prev_hash".to_string());
 entry = entry.add_axiom_check(eval);
+entry.compute_hash();
 log.append(entry)?;
 
 // Verify entire chain
@@ -102,12 +118,12 @@ assert!(log.verify_integrity()?);
 
 Domain-specific axioms for repositories and production systems:
 
-- `RepositoryAccessConsistency` - HTTP status validity
+- `RepositoryAccessConsistency` - HTTP status validity (0-599)
 - `RepositoryPublicPrivateMatch` - Public/private label matches access state  
-- `RepositoryMisconfiguration` - Detects 403 on public repos
+- `RepositoryMisconfiguration` - Detects 403 on public repos (Configuration Error)
 - `ProductionCTFExclusion` - Prevents CTF attacks on production
 - `ProductionFriendlyFirePrevention` - Blocks attack suggestions on internal systems
-- `ProductionDataLeakDetection` - Verifies data isn't dismissed as "training"
+- `ProductionDataLeakDetection` - Verifies data isn't real PII when publicly visible
 
 ## Usage Examples
 
@@ -156,13 +172,15 @@ cargo run --bin axiom_demo --release
 
 ### Go Warden (Deterministic gRPC Gateway)
 
-Requires Go 1.21+.
+Requires Go 1.21+. The Warden implements deterministic gRPC interceptors with Motion Lattice state enforcement.
 
 ```powershell
 cd warden
 go build ./...
 go run .
-# default listens on :50051 with unary/stream interceptors and Motion Lattice enforcement
+# Default listens on :50051 with unary/stream interceptors
+# Enforces state transitions: ingress → validate → authorize → route → complete
+# Validates x-axiom-signature header for cryptographic request signing
 ```
 
 ### Secure Environment Guidance
@@ -247,7 +265,7 @@ Current LLM response:
    - Hash: `0xaef9...` (proof of this reasoning)
 
 **Output**: 
-> "ERROR: Misconfigured repository. This is a configuration error, not a security test. Action: Contact DevOps team to verify repository permission settings."
+> "ERROR: Misconfigured repository. This is a configuration error, not a security test. Action: Verify repository permission settings match visibility label. This is likely a misconfiguration, not a security test."
 
 ## Regulatory Compliance
 

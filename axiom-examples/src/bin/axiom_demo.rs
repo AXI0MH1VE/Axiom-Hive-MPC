@@ -1,4 +1,3 @@
-use axiom_core::Axiom;
 use axiom_lst::{LSTEntry, LSTLog, LogConfig, MerkleTree};
 use axiom_mcp::MCPEngine;
 use axiom_security::{RepositoryMisconfiguration, RepositoryPublicPrivateMatch};

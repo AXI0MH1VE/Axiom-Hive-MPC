@@ -1,4 +1,4 @@
-use axiom_core::{Axiom, AxiomContext, AxiomEvaluation, AxiomHiveError, Priority, SubstrateState};
+use axiom_core::{Axiom, AxiomContext, AxiomEvaluation, AxiomHiveError, SubstrateState};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -153,6 +153,7 @@ mod tests {
                 AxiomResult::Violation {
                     code: "TEST".to_string(),
                     message: "Test violation".to_string(),
+                    remediation: None,
                 }
             }
         }

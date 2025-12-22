@@ -161,6 +161,7 @@ mod tests {
         let violation = AxiomResult::Violation {
             code: "TEST_VIOLATION".to_string(),
             message: "Test message".to_string(),
+            remediation: None,
         };
         let json = serde_json::to_string(&violation).unwrap();
         assert!(json.contains("TEST_VIOLATION"));

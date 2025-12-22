@@ -5,12 +5,12 @@ use axiom_core::AxiomEvaluation;
 /// Epistemic tier - how confident are we in this claim?
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum EpistemicTier {
-    /// Verified by direct substrate probe
-    Verified,
-    /// Inferred from axiom evaluation
-    Inferred,
     /// User assertion (least trusted)
     Speculated,
+    /// Inferred from axiom evaluation
+    Inferred,
+    /// Verified by direct substrate probe
+    Verified,
 }
 
 impl std::fmt::Display for EpistemicTier {

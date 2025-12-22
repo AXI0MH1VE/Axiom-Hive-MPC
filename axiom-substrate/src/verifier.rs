@@ -1,7 +1,6 @@
-use axiom_core::{AxiomHiveError, SubstrateState, SubstrateVerification};
+use axiom_core::{SubstrateState, SubstrateVerification};
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
-use std::str::FromStr;
 
 /// Configuration for substrate verification
 #[derive(Clone, Debug, Serialize, Deserialize)]
