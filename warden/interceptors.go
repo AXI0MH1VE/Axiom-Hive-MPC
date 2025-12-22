@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 // unarySecurityInterceptor enforces signature, lattice, and audit hooks on unary RPCs.
@@ -22,20 +24,20 @@ func unarySecurityInterceptor(lattice *MotionLattice) grpc.UnaryServerIntercepto
 
 		// 1) Enforce deterministic lattice: ingress -> validate
 		if err := lattice.ValidateTransition("ingress", "validate"); err != nil {
-			return nil, grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return nil, status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 
 		// 2) Check cryptographic session signature header
 		if !validSignature(md) {
-			return nil, grpc.Errorf(grpc.Code(grpc.PermissionDenied), "missing or invalid x-axiom-signature")
+			return nil, status.Error(codes.PermissionDenied, "missing or invalid x-axiom-signature")
 		}
 
 		// 3) Advance lattice to authorize, then route
 		if err := lattice.ValidateTransition("validate", "authorize"); err != nil {
-			return nil, grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return nil, status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 		if err := lattice.ValidateTransition("authorize", "route"); err != nil {
-			return nil, grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return nil, status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 
 		// 4) Call handler
@@ -46,7 +48,7 @@ func unarySecurityInterceptor(lattice *MotionLattice) grpc.UnaryServerIntercepto
 
 		// 5) Log state completion transition
 		if err := lattice.ValidateTransition("route", "complete"); err != nil {
-			return nil, grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return nil, status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 
 		return resp, nil
@@ -64,16 +66,16 @@ func streamSecurityInterceptor(lattice *MotionLattice) grpc.StreamServerIntercep
 		md, _ := metadata.FromIncomingContext(ss.Context())
 
 		if err := lattice.ValidateTransition("ingress", "validate"); err != nil {
-			return grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 		if !validSignature(md) {
-			return grpc.Errorf(grpc.Code(grpc.PermissionDenied), "missing or invalid x-axiom-signature")
+			return status.Error(codes.PermissionDenied, "missing or invalid x-axiom-signature")
 		}
 		if err := lattice.ValidateTransition("validate", "authorize"); err != nil {
-			return grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 		if err := lattice.ValidateTransition("authorize", "route"); err != nil {
-			return grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 
 		if err := handler(srv, ss); err != nil {
@@ -81,7 +83,7 @@ func streamSecurityInterceptor(lattice *MotionLattice) grpc.StreamServerIntercep
 		}
 
 		if err := lattice.ValidateTransition("route", "complete"); err != nil {
-			return grpc.Errorf(grpc.Code(grpc.PermissionDenied), err.Error())
+			return status.Errorf(codes.PermissionDenied, "%v", err)
 		}
 		return nil
 	}

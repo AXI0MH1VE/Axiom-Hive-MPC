@@ -89,9 +89,12 @@ impl LSTEntry {
     }
 
     pub fn add_axiom_check(mut self, check: AxiomEvaluation) -> Self {
-        // Update epistemic tier based on axiom results
+        // Update epistemic tier based on axiom results - upgrade to Verified if all pass
         if check.result.is_pass() {
-            self.epistemic_tier = EpistemicTier::Verified;
+            // Only upgrade if current tier is lower than Verified
+            if self.epistemic_tier < EpistemicTier::Verified {
+                self.epistemic_tier = EpistemicTier::Verified;
+            }
         }
         self.axiom_checks.push(check);
         self
