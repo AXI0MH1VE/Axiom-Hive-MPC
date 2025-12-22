@@ -22,7 +22,7 @@ impl Axiom for ProductionCTFExclusion {
         context
             .deployment_context
             .as_ref()
-            .map(|c| c.contains("production") || c.contains("corporate") || c.contains("internal"))
+            .map(|c: &String| c.contains("production") || c.contains("corporate") || c.contains("internal"))
             .unwrap_or(true)
     }
 

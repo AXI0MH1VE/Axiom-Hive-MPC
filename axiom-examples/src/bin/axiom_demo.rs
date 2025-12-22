@@ -51,6 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             entry1.compute_hash();
             let hash1 = lst_log.append(entry1.clone())?;
+            let hash1_clone = hash1.clone();
 
             println!("   Entry #1:");
             println!("   Query: {}", entry1.query);
@@ -80,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     println!("   Entry #2:");
                     println!("   Query: {}", entry2.query);
-                    println!("   Previous Hash: {}", &hash1[..16]);
+                    println!("   Previous Hash: {}", &hash1_clone[..16]);
                     println!("   Current Hash: {}", &hash2[..16]);
                     println!();
 
@@ -101,7 +102,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("────────────────────────────────");
 
                     let mut tree = MerkleTree::new();
-                    tree.add_leaf(&hash1);
+                    tree.add_leaf(&hash1_clone);
                     tree.add_leaf(&hash2);
                     tree.build();
 
@@ -109,7 +110,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("   Root Hash: {}", &root[..16]);
 
                         // Generate proof for first entry
-                        if let Some(proof) = tree.proof_for_leaf(&hash1) {
+                        if let Some(proof) = tree.proof_for_leaf(&hash1_clone) {
                             println!("   Merkle Proof for Entry #1:");
                             println!("   Path Length: {}", proof.path.len());
 

@@ -82,10 +82,13 @@ async fn resolve_repository_paradox() -> Result<(), AxiomHiveError> {
                     axiom_core::AxiomResult::Pass => {
                         println!("  ✓ {}: PASS", eval.axiom_name);
                     }
-                    axiom_core::AxiomResult::Violation { code, message } => {
+                    axiom_core::AxiomResult::Violation { code, message, remediation } => {
                         println!("  ✗ {}: VIOLATION", eval.axiom_name);
                         println!("    Code: {}", code);
                         println!("    Message: {}", message);
+                        if let Some(rem) = remediation {
+                            println!("    Remediation: {}", rem);
+                        }
                     }
                 }
             }

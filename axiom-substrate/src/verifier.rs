@@ -85,7 +85,7 @@ impl SubstrateVerifier {
             }
             IpAddr::V6(ipv6) => {
                 // Check for IPv6 loopback (::1) and link-local (fe80::)
-                ipv6.is_loopback() || ipv6.is_link_local()
+                ipv6.is_loopback() || ipv6.is_unicast_link_local()
             }
         }
     }
