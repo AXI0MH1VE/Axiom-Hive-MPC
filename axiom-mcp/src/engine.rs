@@ -45,8 +45,7 @@ impl MCPEngine {
         }
         self.axioms.push(axiom);
         // Sort by priority (highest first)
-        self.axioms
-            .sort_by(|a, b| b.priority().cmp(&a.priority()));
+        self.axioms.sort_by(|a, b| b.priority().cmp(&a.priority()));
         Ok(())
     }
 
@@ -87,9 +86,12 @@ impl MCPEngine {
             // If halt_on_violation and axiom failed, stop evaluation
             if self.config.halt_on_violation && result.is_violation() {
                 evaluations.push(evaluation);
-                return Err(AxiomHiveError::AxiomError(axiom_core::AxiomError::Violation(
-                    format!("Axiom {} violation detected", axiom.name()),
-                )));
+                return Err(AxiomHiveError::AxiomError(
+                    axiom_core::AxiomError::Violation(format!(
+                        "Axiom {} violation detected",
+                        axiom.name()
+                    )),
+                ));
             }
 
             evaluations.push(evaluation);

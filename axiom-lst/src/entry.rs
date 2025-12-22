@@ -1,6 +1,6 @@
+use axiom_core::AxiomEvaluation;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use axiom_core::AxiomEvaluation;
 
 /// Epistemic tier - how confident are we in this claim?
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]

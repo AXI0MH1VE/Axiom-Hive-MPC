@@ -155,7 +155,9 @@ impl MerkleTree {
         if let Some(right) = &node.right {
             if let Some(found) = self.proof_recursive(right, target, proof) {
                 if let Some(left) = &node.left {
-                    proof.path.insert(0, (left.hash.clone(), ProofDirection::Left));
+                    proof
+                        .path
+                        .insert(0, (left.hash.clone(), ProofDirection::Left));
                 }
                 return Some(found);
             }

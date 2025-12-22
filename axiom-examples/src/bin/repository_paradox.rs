@@ -51,7 +51,10 @@ async fn resolve_repository_paradox() -> Result<(), AxiomHiveError> {
     println!("  HTTP Status: 403 FORBIDDEN");
     println!("  Visibility Label: PUBLIC");
     println!("  Internal Network: No");
-    println!("  Cryptographic Signature: {}", &substrate_state.signature[..16]);
+    println!(
+        "  Cryptographic Signature: {}",
+        &substrate_state.signature[..16]
+    );
     println!();
 
     // Create MCP Engine with axioms
@@ -81,7 +84,11 @@ async fn resolve_repository_paradox() -> Result<(), AxiomHiveError> {
                     axiom_core::AxiomResult::Pass => {
                         println!("  ✓ {}: PASS", eval.axiom_name);
                     }
-                    axiom_core::AxiomResult::Violation { code, message, remediation } => {
+                    axiom_core::AxiomResult::Violation {
+                        code,
+                        message,
+                        remediation,
+                    } => {
                         println!("  ✗ {}: VIOLATION", eval.axiom_name);
                         println!("    Code: {}", code);
                         println!("    Message: {}", message);

@@ -22,7 +22,9 @@ impl Axiom for ProductionCTFExclusion {
         context
             .deployment_context
             .as_ref()
-            .map(|c: &String| c.contains("production") || c.contains("corporate") || c.contains("internal"))
+            .map(|c: &String| {
+                c.contains("production") || c.contains("corporate") || c.contains("internal")
+            })
             .unwrap_or(true)
     }
 
@@ -32,7 +34,10 @@ impl Axiom for ProductionCTFExclusion {
                 .dns_resolution
                 .map(|ip| {
                     let s = ip.to_string();
-                    s.starts_with("10.") || s.starts_with("172.") || s.starts_with("192.168") || s.starts_with("127.")
+                    s.starts_with("10.")
+                        || s.starts_with("172.")
+                        || s.starts_with("192.168")
+                        || s.starts_with("127.")
                 })
                 .unwrap_or(false)
             || state.tls_valid;
@@ -72,11 +77,19 @@ impl Axiom for ProductionFriendlyFirePrevention {
                 .dns_resolution
                 .map(|ip| {
                     let s = ip.to_string();
-                    s.starts_with("10.") || s.starts_with("172.") || s.starts_with("192.168") || s.starts_with("127.")
+                    s.starts_with("10.")
+                        || s.starts_with("172.")
+                        || s.starts_with("192.168")
+                        || s.starts_with("127.")
                 })
                 .unwrap_or(false);
 
-        if guarded && matches!(state.http_status, Some(401) | Some(402) | Some(403) | Some(404) | Some(418) | Some(429)) {
+        if guarded
+            && matches!(
+                state.http_status,
+                Some(401) | Some(402) | Some(403) | Some(404) | Some(418) | Some(429)
+            )
+        {
             return AxiomResult::Violation {
                 code: "BLOCK_ATTACK_SUGGESTIONS".to_string(),
                 message: "Internal environment with access restrictions: suppress attack vector suggestions (brute force, SQLi, header manipulation).".to_string(),

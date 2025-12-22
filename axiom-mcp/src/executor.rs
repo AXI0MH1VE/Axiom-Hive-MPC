@@ -11,10 +11,7 @@ pub struct ExecutionResult {
 }
 
 impl ExecutionResult {
-    pub fn from_evaluations(
-        evaluations: Vec<AxiomEvaluation>,
-        start: std::time::Instant,
-    ) -> Self {
+    pub fn from_evaluations(evaluations: Vec<AxiomEvaluation>, start: std::time::Instant) -> Self {
         let success = evaluations.iter().all(|e| e.result.is_pass());
         let total_duration_ms = start.elapsed().as_millis() as u64;
 
@@ -43,9 +40,7 @@ pub struct ConstraintExecutor {
 
 impl ConstraintExecutor {
     pub fn new(name: impl Into<String>) -> Self {
-        Self {
-            name: name.into(),
-        }
+        Self { name: name.into() }
     }
 
     pub fn name(&self) -> &str {
@@ -53,10 +48,7 @@ impl ConstraintExecutor {
     }
 
     /// Execute a pre-condition check
-    pub fn check_precondition<F>(
-        &self,
-        check_fn: F,
-    ) -> Result<ExecutionResult, AxiomHiveError>
+    pub fn check_precondition<F>(&self, check_fn: F) -> Result<ExecutionResult, AxiomHiveError>
     where
         F: FnOnce() -> Result<Vec<AxiomEvaluation>, AxiomHiveError>,
     {
@@ -68,10 +60,7 @@ impl ConstraintExecutor {
     }
 
     /// Execute a post-condition check
-    pub fn check_postcondition<F>(
-        &self,
-        check_fn: F,
-    ) -> Result<ExecutionResult, AxiomHiveError>
+    pub fn check_postcondition<F>(&self, check_fn: F) -> Result<ExecutionResult, AxiomHiveError>
     where
         F: FnOnce() -> Result<Vec<AxiomEvaluation>, AxiomHiveError>,
     {

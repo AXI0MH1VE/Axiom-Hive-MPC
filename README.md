@@ -295,8 +295,9 @@ cargo test --all -- --nocapture
 # Test specific crate
 cargo test -p axiom-core
 
-# Test specific test
-cargo test test_repository_paradox
+# Run specific tests
+cargo test test_axiom_result_serialization
+cargo test test_misconfiguration_detection
 ```
 
 ## Safety Properties

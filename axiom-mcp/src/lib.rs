@@ -4,4 +4,4 @@ pub mod handler;
 
 pub use engine::{MCPEngine, MCPEngineConfig};
 pub use executor::{ConstraintExecutor, ExecutionResult};
-pub use handler::{PreInferenceHandler, PostInferenceHandler};
+pub use handler::{PostInferenceHandler, PreInferenceHandler};

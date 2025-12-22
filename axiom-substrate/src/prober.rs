@@ -25,6 +25,7 @@ impl Default for ProbeConfig {
 /// HTTP substrate prober
 pub struct HttpProber {
     client: reqwest::Client,
+    #[allow(dead_code)]
     config: ProbeConfig,
 }
 
@@ -43,27 +44,19 @@ impl HttpProber {
     pub async fn probe_repository(&self, url: &str) -> Result<SubstrateState, AxiomHiveError> {
         tracing::info!("Probing repository: {}", url);
 
-        let response = self
-            .client
-            .head(url)
-            .send()
-            .await
-            .map_err(|e| AxiomHiveError::request_error(format!("HEAD request failed: {}", e)))?;
+        let response =
+            self.client.head(url).send().await.map_err(|e| {
+                AxiomHiveError::request_error(format!("HEAD request failed: {}", e))
+            })?;
 
         let status = response.status().as_u16();
         let headers = response
             .headers()
             .iter()
-            .map(|(k, v)| {
-                (
-                    k.to_string(),
-                    v.to_str().unwrap_or("invalid").to_string(),
-                )
-            })
+            .map(|(k, v)| (k.to_string(), v.to_str().unwrap_or("invalid").to_string()))
             .collect();
 
-        let mut state = SubstrateState::new()
-            .with_http_status(status);
+        let mut state = SubstrateState::new().with_http_status(status);
 
         // Check for visibility metadata in headers
         if let Some(x_visibility) = response.headers().get("x-visibility") {
@@ -80,7 +73,11 @@ impl HttpProber {
     }
 
     /// Probe with GET request to sample content
-    pub async fn probe_content_sample(&self, url: &str, max_bytes: usize) -> Result<SubstrateState, AxiomHiveError> {
+    pub async fn probe_content_sample(
+        &self,
+        url: &str,
+        max_bytes: usize,
+    ) -> Result<SubstrateState, AxiomHiveError> {
         tracing::info!("Sampling content from: {}", url);
 
         let response = self
@@ -91,16 +88,14 @@ impl HttpProber {
             .map_err(|e| AxiomHiveError::request_error(format!("GET request failed: {}", e)))?;
 
         let status = response.status().as_u16();
-        let bytes = response
-            .bytes()
-            .await
-            .map_err(|e| AxiomHiveError::request_error(format!("Failed to read response: {}", e)))?;
+        let bytes = response.bytes().await.map_err(|e| {
+            AxiomHiveError::request_error(format!("Failed to read response: {}", e))
+        })?;
 
         let sample = &bytes[..std::cmp::min(max_bytes, bytes.len())];
         let hash = hash_content(sample);
 
-        let state = SubstrateState::new()
-            .with_http_status(status);
+        let state = SubstrateState::new().with_http_status(status);
 
         let mut final_state = state.with_visibility("sampled".to_string());
         final_state.content_hash = Some(hash);
