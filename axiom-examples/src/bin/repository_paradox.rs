@@ -1,5 +1,4 @@
-use axiom_core::{Axiom, AxiomContext, AxiomHiveError, SubstrateState};
-use axiom_mcp::MCPEngine;
+use axiom_core::{AxiomContext, AxiomHiveError, SubstrateState};
 use axiom_security::{
     RepositoryAccessConsistency, RepositoryMisconfiguration, RepositoryPublicPrivateMatch,
 };
@@ -82,7 +81,7 @@ async fn resolve_repository_paradox() -> Result<(), AxiomHiveError> {
                     axiom_core::AxiomResult::Pass => {
                         println!("  ✓ {}: PASS", eval.axiom_name);
                     }
-                    axiom_core::AxiomResult::Violation { code, message } => {
+                    axiom_core::AxiomResult::Violation { code, message, .. } => {
                         println!("  ✗ {}: VIOLATION", eval.axiom_name);
                         println!("    Code: {}", code);
                         println!("    Message: {}", message);

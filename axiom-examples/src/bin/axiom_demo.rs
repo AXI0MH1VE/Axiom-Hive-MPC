@@ -1,4 +1,3 @@
-use axiom_core::Axiom;
 use axiom_lst::{LSTEntry, LSTLog, LogConfig, MerkleTree};
 use axiom_mcp::MCPEngine;
 use axiom_security::{RepositoryMisconfiguration, RepositoryPublicPrivateMatch};
@@ -69,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             match mcp_engine.evaluate_pre_inference(&substrate_state2, &context) {
                 Ok(evaluations) => {
-                    let mut entry2 = LSTEntry::new(2, "Clone repository Y", hash1);
+                    let mut entry2 = LSTEntry::new(2, "Clone repository Y", hash1.clone());
 
                     for eval in evaluations {
                         entry2 = entry2.add_axiom_check(eval);

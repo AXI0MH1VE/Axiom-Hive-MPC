@@ -1,7 +1,6 @@
-use axiom_core::{AxiomHiveError, SubstrateState, SubstrateVerification};
+use axiom_core::{SubstrateState, SubstrateVerification};
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
-use std::str::FromStr;
 
 /// Configuration for substrate verification
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -85,7 +84,7 @@ impl SubstrateVerifier {
             }
             IpAddr::V6(ipv6) => {
                 // Check for IPv6 loopback (::1) and link-local (fe80::)
-                ipv6.is_loopback() || ipv6.is_link_local()
+                ipv6.is_loopback() || ipv6.is_unicast_link_local()
             }
         }
     }
