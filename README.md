@@ -3,7 +3,7 @@
 A Rust-based platform that solves the **substrate grounding failure** in LLM reasoning systems through pre-inference axiom constraints, cryptographic substrate verification, and tamper-proof logging.
 
 ## Overview
-
+**Creator: NICHOLAS M. GROSSI**
 AxiomHive forces ontological collapse in LLM reasoning by:
 
 1. **MCP (Model Control Protocol)**: Pre-inference axiom constraints that make contradictory states mathematically impossible
